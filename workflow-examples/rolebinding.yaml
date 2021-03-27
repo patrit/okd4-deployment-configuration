@@ -5,6 +5,7 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: argocd-server
   name: argocd-server
+  namespace: workflow-examples
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

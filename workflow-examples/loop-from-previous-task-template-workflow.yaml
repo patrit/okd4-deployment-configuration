@@ -4,13 +4,15 @@ metadata:
   name: loop-from-previous-task-template
 spec:
   entrypoint: loop-from-previous-task
+  arguments:
+    parameters:
+      - name: number
+        value: 12
   templates:
-
   - name: loop-from-previous-task
     inputs:
       parameters:
       - name: number
-        value: 12
     steps:
     - - name: generate
         template: gen-dict-list

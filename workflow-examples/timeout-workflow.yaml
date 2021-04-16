@@ -7,7 +7,7 @@ spec:
   templates:
   - name: sleep
     container:
-      image: alpine:latest
+      image: busybox:latest
       command: [sh, -c]
       args: ["echo sleeping for 1m; sleep 60; echo done"]
     activeDeadlineSeconds: 10

@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: complete-workflow
+spec:
+  entrypoint: dump
+  volumes:
+  - name: workdir
+    persistentVolumeClaim:
+      claimName: complete-pvc
+  - name: complete-secret-vol
+    secret:
+      secretName: complete-secret     # name of an existing k8s secret
+  templates:
+  - name: dump
+    container:
+      image: busybox:latest
+      command: [sh, -c]
+      args: ["env && find /mnt && find /secret && touch /mnt/work/run_$(date | tr ' ' '_')"]
+      # To access secrets as environment variables, use the k8s valueFrom and
+      # secretKeyRef constructs.
+      env:
+      - name: password  # name of env var
+        valueFrom:
+          secretKeyRef:
+            name: complete-secret   # name of an existing k8s secret
+            key: password         # 'key' subcomponent of the secret      
+      volumeMounts:
+      - name: workdir
+        mountPath: "/mnt/work"
+      - name: complete-secret-vol     # mount file containing secret at /secret/mountpath
+        mountPath: "/secret/mountpath"

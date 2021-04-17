@@ -20,6 +20,8 @@ spec:
       # To access secrets as environment variables, use the k8s valueFrom and
       # secretKeyRef constructs.
       env:
+      - name: val
+        value: val42
       - name: password  # name of env var
         valueFrom:
           secretKeyRef:

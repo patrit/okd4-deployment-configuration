@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: complete-testing-workflow
+spec:
+  entrypoint: entry
+  arguments:
+    parameters:
+      - name: whitelist
+        value: ''
+  volumeClaimTemplates:
+  - metadata:
+      name: workdir
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+  volumes:
+  - name: complete-secret-vol
+    secret:
+      secretName: complete-secret   # name of an existing secret
+  - name: complete-configmap-vol
+    configMap:
+      name: complete-configmap
+  templates:
+  - name: entry
+    inputs:
+      parameters:
+      - name: whitelist
+    steps:
+    - - name: prepare
+        template: prepare
+        arguments:
+          parameters:
+          - name: whitelist
+            value: "{{inputs.parameters.whitelist}}"
+    - - name: dump
+        template: dump
+  - name: prepare
+    inputs:
+      parameters:
+      - name: whitelist
+    container:
+      image: busybox:latest
+      command: [sh, -c]
+      args: ["echo '{{inputs.parameters.whitelist}}' > /mnt/work/whitelist"]
+      volumeMounts:
+      - name: workdir
+        mountPath: "/mnt/work"
+  - name: dump
+    container:
+      image: busybox:latest
+      command: [sh, -c]
+      args: ["env && find /mnt && touch /mnt/work/run_$(date | tr ' ' '_')"]
+      # To access secrets as environment variables, use the k8s valueFrom and
+      # secretKeyRef constructs.
+      env:
+      - name: val
+        value: val42
+      - name: extracted_password  # name of env var
+        valueFrom:
+          secretKeyRef:
+            name: complete-secret  # name of an existing secret
+            key: password          # 'key' subcomponent of the secret
+      - name: extracted_player_initial_lives
+        valueFrom:
+          configMapKeyRef:
+            name: complete-configmap   # name of an existing configmap
+            key: player_initial_lives  # 'key' subcomponent of the configmap
+      envFrom:
+        - configMapRef:
+            name: complete-configmap # whole configmap
+        - secretRef:
+            name: complete-secret    # whole security
+      volumeMounts:
+      - name: workdir
+        mountPath: "/mnt/work"
+      - name: complete-secret-vol     # mount file containing secret at /mnt/secret
+        mountPath: "/mnt/secret"
+      - name: complete-configmap-vol  # mount file containing configmap at /mnt/configmap
+        mountPath: /mnt/configmap

@@ -41,9 +41,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-#          volumeMounts:
-#            - mountPath: /media/complete
-#              name: complete-volume
+          volumeMounts:
+            - mountPath: /media/complete
+              name: complete-volume
       volumes:
         - name: complete-volume
           persistentVolumeClaim:

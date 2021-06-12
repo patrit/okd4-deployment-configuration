@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
         - name: webdav
-          image: "ugeek/webdav:amd64"
+          image: "bytemark/webdav:2.4"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

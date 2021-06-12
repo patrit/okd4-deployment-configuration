@@ -11,6 +11,9 @@ spec:
     port: 8080
     protocol: TCP
     targetPort: http
+  selector:
+    app: webdav
+    release: RELEASE-NAME
 ---
 # Source: workflow-examples/charts/webdav/templates/deployment.yaml
 apiVersion: apps/v1
